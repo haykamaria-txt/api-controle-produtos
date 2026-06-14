@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model categoria {
+  id_categoria  Int       @id @default(autoincrement())
+  nome          String    @unique(map: "nome") @db.VarChar(50)
+  descricao     String?   @db.VarChar(150)
+  criado_em     DateTime  @default(now()) @db.DateTime(0)
+  atualizado_em DateTime  @default(now()) @db.DateTime(0)
+  produto       produto[]
+}
+
+model produto {
+  id_produto             Int       @id @default(autoincrement())
+  nome                   String    @db.VarChar(50)
+  descricao              String?   @db.VarChar(150)
+  preco                  Decimal   @db.Decimal(10, 2)
+  estoque                Int       @default(0)
+  ativo_sn               Boolean   @default(true)
+  fk_categoria_id        Int
+  fk_criado_pelo_usuario Int
+  criado_em              DateTime  @default(now()) @db.DateTime(0)
+  atualizado_em          DateTime  @default(now()) @db.DateTime(0)
+  categoria              categoria @relation(fields: [fk_categoria_id], references: [id_categoria], onDelete: NoAction, onUpdate: NoAction, map: "fk_produto_categoria")
+  usuario                usuario   @relation(fields: [fk_criado_pelo_usuario], references: [id_usuario], onDelete: NoAction, onUpdate: NoAction, map: "fk_produto_usuario")
+
+  @@index([fk_categoria_id], map: "fk_produto_categoria")
+  @@index([fk_criado_pelo_usuario], map: "fk_produto_usuario")
+}
+
+model usuario {
+  email         String         @unique(map: "email") @db.VarChar(100)
+  nome          String         @db.VarChar(50)
+  id_usuario    Int            @id @default(autoincrement())
+  senha_hash    String         @db.VarChar(255)
+  funcao        usuario_funcao @default(user)
+  criado_em     DateTime       @default(now()) @db.DateTime(0)
+  atualizado_em DateTime       @default(now()) @db.DateTime(0)
+  produto       produto[]
+}
+
+enum usuario_funcao {
+  user
+  admin
+}
