@@ -1,0 +1,9 @@
+*
+!*/
+!**/*.js
+!**/*.json
+!**/*.md
+node_modules/
+generated/
+prisma/migrations/
+coverage/
